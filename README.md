@@ -26,7 +26,7 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 ## Knowledge References
 
-- [Google SRE Book](https://sre.google/sre-book/table-of-contents/) - Reference for principles and methodologies applied to operational reliability, observability, and automation.
+- [https://sre.google/sre-book/table-of-contents/](https://sre.google/sre-book/table-of-contents/) - Reference for principles and methodologies applied to operational reliability, observability, and automation.
 
 - [https://cobra.dev](https://cobra.dev) - Official site for Cobra CLI framework.
 
