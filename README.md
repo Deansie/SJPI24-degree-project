@@ -38,6 +38,18 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 - [https://github.com/cloudflare/cloudflare-go](https://github.com/cloudflare/cloudflare-go) - Cloudflare Go API library for DNS automation.  
 
+- [https://github.com/kubernetes/client-go](https://github.com/kubernetes/client-go) – Official Kubernetes Go client for working with clusters and API objects.  
+
+- [https://pkg.go.dev/sigs.k8s.io/yaml](https://pkg.go.dev/sigs.k8s.io/yaml) – YAML/JSON parsing utilities for Go, used to unmarshal and validate Kubernetes manifests.  
+
+- [https://pkg.go.dev/k8s.io/apimachinery](https://pkg.go.dev/k8s.io/apimachinery) – Kubernetes API machinery for runtime objects, decoding, and schema handling.  
+
+- [https://pkg.go.dev/k8s.io/api](https://pkg.go.dev/k8s.io/api) – Core Kubernetes API object definitions (Deployments, Services, Ingress, etc.).  
+
+- [https://github.com/kubernetes/kube-openapi](https://github.com/kubernetes/kube-openapi) – OpenAPI schema validation used by Kubernetes for API consistency and validation.  
+
+- [https://github.com/instrumenta/kubeval](https://github.com/instrumenta/kubeval) – YAML schema validation tool for Kubernetes manifests (reference for building custom validation).  
+
 ---
 
 ## Technologies Used
