@@ -26,9 +26,23 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 ## Knowledge References
 
-### SRE Rules and Best Practices
-- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)  
-  Reference for principles and methodologies applied to operational reliability, observability, and automation.
+[Google SRE Book](https://sre.google/sre-book/table-of-contents/)  
+Reference for principles and methodologies applied to operational reliability, observability, and automation.
+
+[https://cobra.dev](https://cobra.dev)
+Official site for Cobra CLI framework.
+
+[https://github.com/charmbracelet/fang](https://github.com/charmbracelet/fang)
+Fang library for Go CLI flag and argument handling.  
+
+[https://go.dev/doc/](https://go.dev/doc/)
+Official Go documentation and guides.  
+
+[https://cert-manager.io/docs/](https://cert-manager.io/docs/)
+Documentation for Cert-Manager (TLS automation) in Kubernetes.  
+
+[https://github.com/cloudflare/cloudflare-go](https://github.com/cloudflare/cloudflare-go)
+Cloudflare Go API library for DNS automation.  
 
 ---
 
