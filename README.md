@@ -63,6 +63,12 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 ---
 
+## UML-Diagram
+
+![UML-Diagram](assets/images/UML-diagram.png)
+
+---
+
 ## Author
 **Dennis Andersen**  
 Higher Vocational Education Diploma in System Development (Java & JavaScript)  
