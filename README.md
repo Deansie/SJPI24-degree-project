@@ -63,9 +63,13 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 ---
 
-## UML-Diagram
+## UML Diagrams
 
+### Use-case Diagram:
 ![](assets/images/use-case-diagram.png)
+
+### Activity Diagram:
+![](assets/images/activity-diagram.png)
 
 ---
 
