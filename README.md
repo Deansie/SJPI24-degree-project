@@ -63,7 +63,7 @@ The solution aims to eliminate deployment errors, ensure consistent and secure c
 
 ---
 
-## UML Design
+## Object-Oriented Analysis and Design (OOAD)
 
 - [General overview](ooad/overview.md)
 
