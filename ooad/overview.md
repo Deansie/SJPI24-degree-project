@@ -1,8 +1,8 @@
 # Requirements
 
-[Non-functional Requirements](analysis/nonfunctional-requirements.md)
-
 [Functional Requirements](analysis/functional-requirements.md)
+
+[Non-functional Requirements](analysis/nonfunctional-requirements.md)
 
 # UML Diagrams
 
