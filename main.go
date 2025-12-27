@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/Deansie/SJPI24-degree-project/cmd"
 
 func main() {
-	fmt.Println("Hello world!")
+	cmd.Execute()
 }
