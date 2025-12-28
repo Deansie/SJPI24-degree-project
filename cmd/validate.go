@@ -9,7 +9,7 @@ import (
 var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Validate Kubernetes YAML manifests against schema and SRE rules",
-	Long: `Validates one or more YAML files containing Kubernetes resources (Deployments, Services, Ingress, etc.) 
+	Long: appLogo + `Validates one or more YAML files containing Kubernetes resources (Deployments, Services, Ingress, etc.) 
 using official schemas and custom SRE-inspired checks (e.g., resource limits, labels, security contexts).
 
 Fails the deployment pipeline early if issues are found, preventing faulty applies to the cluster.

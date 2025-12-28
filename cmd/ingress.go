@@ -9,8 +9,8 @@ import (
 var ingressCmd = &cobra.Command{
 	Use:   "ingress",
 	Short: "Setup and manage Kubernetes Ingress resources with automatic TLS via cert-manager",
-	Long: `Creates or updates Ingress manifests with cert-manager annotations for automatic Let's Encrypt certificates.
-Supports initial setup flows and ensures end-to-end TLS encryption.
+	Long: appLogo + `Creates or updates Ingress manifests with cert-manager annotations for automatic Let's Encrypt
+certificates. Supports initial setup flows and ensures end-to-end TLS encryption.
 
 Integrates seamlessly with DNS sync for full external access automation.
 
