@@ -1,8 +1,8 @@
-package cmd
+package validation
 
 import "fmt"
 
-func reportRuleViolations(violations []RuleViolation) {
+func ReportRuleViolations(violations []RuleViolation) {
 	for _, v := range violations {
 		fmt.Printf("✗ %s %s\n", v.Resource.Kind, v.Resource.Name)
 		fmt.Printf("  - %s\n", v.Message)
