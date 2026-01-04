@@ -6,6 +6,7 @@ type Resource struct {
 	Kind      string
 	Name      string
 	Namespace string
+	Labels    map[string]string
 }
 
 type RuleViolation struct {
@@ -28,6 +29,33 @@ func ruleNamespaceRequired(r Resource) []RuleViolation {
 	return violations
 }
 
+// Verify labels 'app' and 'env' are present
+
+func ruleRequiredLabels(r Resource) []RuleViolation {
+	var violations []RuleViolation
+
+	requiredLabels := []string{"app", "env"}
+
+	for _, label := range requiredLabels {
+		if r.Labels == nil {
+			violations = append(violations, RuleViolation{
+				Resource: r,
+				Message:  "missing required label: " + label,
+			})
+			continue
+		}
+
+		if _, ok := r.Labels[label]; !ok {
+			violations = append(violations, RuleViolation{
+				Resource: r,
+				Message:  "missing required label: " + label,
+			})
+		}
+	}
+
+	return violations
+}
+
 // Rule runner
 
 func ValidateRules(resources []Resource) []RuleViolation {
@@ -35,6 +63,7 @@ func ValidateRules(resources []Resource) []RuleViolation {
 
 	for _, r := range resources {
 		allViolations = append(allViolations, ruleNamespaceRequired(r)...)
+		allViolations = append(allViolations, ruleRequiredLabels(r)...)
 	}
 
 	return allViolations

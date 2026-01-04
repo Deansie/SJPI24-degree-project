@@ -43,6 +43,14 @@ func extractResource(doc map[string]interface{}) Resource {
 		if ns, ok := meta["namespace"].(string); ok {
 			res.Namespace = ns
 		}
+		if labels, ok := meta["labels"].(map[string]interface{}); ok {
+			res.Labels = make(map[string]string)
+			for k, v := range labels {
+				if val, ok := v.(string); ok {
+					res.Labels[k] = val
+				}
+			}
+		}
 	}
 
 	return res
