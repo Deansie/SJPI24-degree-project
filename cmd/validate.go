@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/validation"
 	"github.com/spf13/cobra"
 	"github.com/yannh/kubeconform/pkg/validator"
 )
@@ -61,10 +62,10 @@ func runValidate(cmd *cobra.Command, args []string) error {
 
 	// Parse resources for rule validation
 
-	var allResources []Resource
+	var allResources []validation.Resource
 
 	for _, in := range inputs {
-		resources, err := ParseResources(bytes.NewReader(in.Data))
+		resources, err := validation.ParseResources(bytes.NewReader(in.Data))
 		if err != nil {
 			return fmt.Errorf("failed to parse resources: %w", err)
 		}
@@ -73,9 +74,9 @@ func runValidate(cmd *cobra.Command, args []string) error {
 
 	// Apply rules
 
-	violations := ValidateRules(allResources)
+	violations := validation.ValidateRules(allResources)
 	if len(violations) > 0 {
-		reportRuleViolations(violations)
+		validation.ReportRuleViolations(violations)
 		return fmt.Errorf("%d rule violation(s) found", len(violations))
 	}
 
