@@ -49,6 +49,11 @@ func runValidate(cmd *cobra.Command, args []string) error {
 
 	results := validateInputsPerFile(opts, inputs)
 
+	if len(results) == 0 {
+		fmt.Println("No YAML manifests found to validate")
+		return nil
+	}
+
 	if errors := reportResults(results); errors > 0 {
 		return fmt.Errorf("%d validation error(s) found", errors)
 	}
