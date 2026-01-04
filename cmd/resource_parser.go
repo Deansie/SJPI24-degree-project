@@ -53,5 +53,58 @@ func extractResource(doc map[string]interface{}) Resource {
 		}
 	}
 
+	spec, ok := doc["spec"].(map[string]interface{})
+	if !ok {
+		return res
+	}
+
+	template, ok := spec["template"].(map[string]interface{})
+	if !ok {
+		return res
+	}
+	templateSpec, ok := template["spec"].(map[string]interface{})
+	if !ok {
+		return res
+	}
+	containers, ok := templateSpec["containers"].([]interface{})
+	if !ok {
+		return res
+	}
+
+	for _, c := range containers {
+		cm, ok := c.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		container := Container{}
+
+		if name, ok := cm["name"].(string); ok {
+			container.Name = name
+		}
+
+		if resources, ok := cm["resources"].(map[string]interface{}); ok {
+			if req, ok := resources["requests"].(map[string]interface{}); ok {
+				container.Requests = map[string]string{}
+				for k, v := range req {
+					if val, ok := v.(string); ok {
+						container.Requests[k] = val
+					}
+				}
+			}
+
+			if lim, ok := resources["limits"].(map[string]interface{}); ok {
+				container.Limits = map[string]string{}
+				for k, v := range lim {
+					if val, ok := v.(string); ok {
+						container.Limits[k] = val
+					}
+				}
+			}
+		}
+
+		res.Containers = append(res.Containers, container)
+	}
+
 	return res
 }
