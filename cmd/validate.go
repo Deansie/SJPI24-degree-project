@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/fs"
@@ -12,8 +13,8 @@ import (
 )
 
 type Input struct {
-	Name   string
-	Reader io.ReadCloser
+	Name string
+	Data []byte
 }
 
 var validateCmd = &cobra.Command{
@@ -45,7 +46,6 @@ func runValidate(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer closeInputs(inputs)
 
 	results := validateInputsPerFile(opts, inputs)
 
@@ -55,14 +55,36 @@ func runValidate(cmd *cobra.Command, args []string) error {
 	}
 
 	if errors := reportResults(results); errors > 0 {
+		fmt.Println("\nRule validation skipped due to schema validation errors")
 		return fmt.Errorf("%d validation error(s) found", errors)
 	}
 
-	fmt.Println("All manifests validated successfully!")
+	// Parse resources for rule validation
+
+	var allResources []Resource
+
+	for _, in := range inputs {
+		resources, err := ParseResources(bytes.NewReader(in.Data))
+		if err != nil {
+			return fmt.Errorf("failed to parse resources: %w", err)
+		}
+		allResources = append(allResources, resources...)
+	}
+
+	// Apply rules
+
+	violations := ValidateRules(allResources)
+	if len(violations) > 0 {
+		reportRuleViolations(violations)
+		return fmt.Errorf("%d rule violation(s) found", len(violations))
+	}
+
+	fmt.Println("✓ Rule validation passed (all resources comply with enforced rules)")
 	return nil
 }
 
 // Validator-setup
+
 type validatorOptions struct {
 	k8sVersion           string
 	strict               bool
@@ -106,10 +128,15 @@ func newValidator(opts validatorOptions) (validator.Validator, error) {
 
 func collectInputs(args []string) ([]Input, error) {
 	if len(args) == 0 {
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, err
+		}
+
 		return []Input{
 			{
-				Name:   "stdin",
-				Reader: io.NopCloser(os.Stdin),
+				Name: "stdin",
+				Data: data,
 			},
 		}, nil
 	}
@@ -123,14 +150,14 @@ func collectInputs(args []string) ([]Input, error) {
 		}
 
 		for _, file := range files {
-			f, err := os.Open(file)
+			content, err := os.ReadFile(file)
 			if err != nil {
 				return nil, err
 			}
 
 			inputs = append(inputs, Input{
-				Name:   file,
-				Reader: f,
+				Name: file,
+				Data: content,
 			})
 		}
 	}
@@ -139,7 +166,6 @@ func collectInputs(args []string) ([]Input, error) {
 }
 
 func expandPath(path string) ([]string, error) {
-
 	if hasGlob(path) {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -185,12 +211,6 @@ func hasGlob(path string) bool {
 	return false
 }
 
-func closeInputs(inputs []Input) {
-	for _, in := range inputs {
-		_ = in.Reader.Close()
-	}
-}
-
 // Validation
 
 func validateInputsPerFile(
@@ -210,7 +230,7 @@ func validateInputsPerFile(
 			continue
 		}
 
-		results := v.Validate(in.Name, in.Reader)
+		results := v.Validate(in.Name, io.NopCloser(bytes.NewReader(in.Data)))
 		allResults = append(allResults, results...)
 	}
 
