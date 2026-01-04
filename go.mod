@@ -6,7 +6,12 @@ require (
 	github.com/charmbracelet/fang v0.4.4
 	github.com/spf13/cobra v1.10.2
 	github.com/yannh/kubeconform v0.7.0
+	sigs.k8s.io/yaml v1.4.0 // indirect
+)
+
+require (
 	golang.org/x/term v0.38.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -38,5 +43,4 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
-	sigs.k8s.io/yaml v1.4.0 // indirect
 )
