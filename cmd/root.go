@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 const appLogo = `
@@ -36,7 +37,9 @@ encryption,and streamlines CI/CD pipelines.`,
 }
 
 func Execute() {
-	clearScreen()
+	if isInteractive() && shouldClearScreen() {
+		clearScreen()
+	}
 
 	if err := fang.Execute(context.Background(), rootCmd); err != nil {
 		os.Exit(1)
@@ -50,4 +53,22 @@ func clearScreen() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
+}
+
+var isInteractive = func() bool {
+	return term.IsTerminal(int(os.Stdout.Fd()))
+}
+
+func shouldClearScreen() bool {
+	if len(os.Args) == 1 {
+		return true
+	}
+
+	for _, arg := range os.Args[1:] {
+		if arg == "--help" || arg == "-h" || arg == "help" {
+			return true
+		}
+	}
+
+	return false
 }
