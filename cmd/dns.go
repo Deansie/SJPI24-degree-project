@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/Deansie/SJPI24-degree-project/internal/dns"
 	"github.com/spf13/cobra"
 )
 
@@ -17,16 +14,7 @@ Used in deployment flows to ensure domains resolve correctly before applying man
 
 Examples:
   k8s-deploy dns sync --domain app.example.com --target 192.0.2.1
-  k8s-deploy dns create --zone example.com --name app --type A --content 192.0.2.1
   k8s-deploy dns list --zone example.com`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		_, err := dns.NewClient()
-		if err != nil {
-			return err
-		}
-		fmt.Println("✓ Cloudflare authentication successful")
-		return nil
-	},
 }
 
 func init() {

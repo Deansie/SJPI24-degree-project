@@ -10,6 +10,8 @@ import (
 	"golang.org/x/term"
 )
 
+var version = "dev"
+
 const appLogo = `
 
         ░██        ░██████                ░███████                         ░██
@@ -41,7 +43,11 @@ func Execute() {
 		clearScreen()
 	}
 
-	if err := fang.Execute(context.Background(), rootCmd); err != nil {
+	if err := fang.Execute(
+		context.Background(),
+		rootCmd,
+		fang.WithVersion(version), // Set version during build 'go build -ldflags "-X github.com/Deansie/SJPI24-degree-project/cmd.version=0.3.0" -o k8s-deploy'
+	); err != nil {
 		os.Exit(1)
 	}
 }
