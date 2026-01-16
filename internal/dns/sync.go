@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/cloudflare/cloudflare-go"
 )
@@ -53,9 +54,14 @@ func SyncDNSRecord(
 
 	rc := cloudflare.ZoneIdentifier(zoneID)
 
-	records, _, err := client.ListDNSRecords(ctx, rc, cloudflare.ListDNSRecordsParams{
-		Name: domain,
-		Type: recordType,
+	var records []cloudflare.DNSRecord
+	err = retryWithBackoff(ctx, 5, time.Second, func() error {
+		var innerErr error
+		records, _, innerErr = client.ListDNSRecords(ctx, rc, cloudflare.ListDNSRecordsParams{
+			Name: domain,
+			Type: recordType,
+		})
+		return innerErr
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list DNS records: %w", err)
@@ -72,12 +78,16 @@ func SyncDNSRecord(
 
 	case 0:
 		// CREATE
-		_, err := client.CreateDNSRecord(ctx, rc, cloudflare.CreateDNSRecordParams{
-			Type:    recordType,
-			Name:    domain,
-			Content: params.Target,
-			TTL:     1, // AUTO
-			Proxied: desiredProxy,
+		err = retryWithBackoff(ctx, 5, time.Second, func() error {
+			var innerErr error
+			_, innerErr = client.CreateDNSRecord(ctx, rc, cloudflare.CreateDNSRecordParams{
+				Type:    recordType,
+				Name:    domain,
+				Content: params.Target,
+				TTL:     1, // AUTO
+				Proxied: desiredProxy,
+			})
+			return innerErr
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create DNS record: %w", err)
@@ -123,13 +133,17 @@ func SyncDNSRecord(
 		}
 
 		// UPDATE
-		_, err := client.UpdateDNSRecord(ctx, rc, cloudflare.UpdateDNSRecordParams{
-			ID:      record.ID,
-			Type:    recordType,
-			Name:    domain,
-			Content: params.Target,
-			TTL:     1,            // AUTO
-			Proxied: desiredProxy, // nil preserves existing when not allowed
+		err = retryWithBackoff(ctx, 5, time.Second, func() error {
+			var innerErr error
+			_, innerErr = client.UpdateDNSRecord(ctx, rc, cloudflare.UpdateDNSRecordParams{
+				ID:      record.ID,
+				Type:    recordType,
+				Name:    domain,
+				Content: params.Target,
+				TTL:     1,            // AUTO
+				Proxied: desiredProxy, // nil preserves existing when not allowed
+			})
+			return innerErr
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to update DNS record: %w", err)
@@ -179,7 +193,12 @@ func findZone(
 	for i := len(labels); i >= 2; i-- {
 		candidate := strings.Join(labels[len(labels)-i:], ".")
 
-		zones, err := client.ListZones(ctx, candidate)
+		var zones []cloudflare.Zone
+		err = retryWithBackoff(ctx, 5, time.Second, func() error {
+			var innerErr error
+			zones, innerErr = client.ListZones(ctx, candidate)
+			return innerErr
+		})
 		if err != nil {
 			return "", "", fmt.Errorf("failed to list zones: %w", err)
 		}

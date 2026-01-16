@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/cloudflare/cloudflare-go"
 )
@@ -23,17 +24,24 @@ func ListDNSRecords(
 	filterType string,
 ) ([]DNSRecord, error) {
 
-	zones, err := client.ListZones(ctx, zoneName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find zone: %w", err)
-	}
+	var zones []cloudflare.Zone
+	err := retryWithBackoff(ctx, 5, time.Second, func() error {
+		var innerErr error
+		zones, innerErr = client.ListZones(ctx, zoneName)
+		return innerErr
+	})
 	if len(zones) == 0 {
 		return nil, fmt.Errorf("zone not found: %s", zoneName)
 	}
 
 	rc := cloudflare.ZoneIdentifier(zones[0].ID)
 
-	records, _, err := client.ListDNSRecords(ctx, rc, cloudflare.ListDNSRecordsParams{})
+	var records []cloudflare.DNSRecord
+	err = retryWithBackoff(ctx, 5, time.Second, func() error {
+		var innerErr error
+		records, _, innerErr = client.ListDNSRecords(ctx, rc, cloudflare.ListDNSRecordsParams{})
+		return innerErr
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list DNS records: %w", err)
 	}

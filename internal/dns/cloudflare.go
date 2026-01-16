@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/cloudflare/cloudflare-go"
 )
@@ -20,7 +21,13 @@ func NewClient() (*cloudflare.API, error) {
 	}
 
 	// Verify token by listing zones (safe, read-only)
-	zones, err := client.ListZones(context.Background())
+	var zones []cloudflare.Zone
+	err = retryWithBackoff(context.Background(), 5, time.Second, func() error {
+		var innerErr error
+		zones, innerErr = client.ListZones(context.Background())
+		return innerErr
+	})
+
 	if err != nil {
 		return nil, fmt.Errorf("Cloudflare authentication failed: %w", err)
 	}
