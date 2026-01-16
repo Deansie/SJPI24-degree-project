@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/cloudflare/cloudflare-go"
 )
 
@@ -31,6 +32,10 @@ func ListDNSRecords(
 		return innerErr
 	})
 	if len(zones) == 0 {
+		logging.L().Error(
+			"zone not found",
+			"zone", zoneName,
+		)
 		return nil, fmt.Errorf("zone not found: %s", zoneName)
 	}
 
@@ -43,6 +48,11 @@ func ListDNSRecords(
 		return innerErr
 	})
 	if err != nil {
+		logging.L().Error(
+			"failed to list DNS records",
+			"zone", zoneName,
+			"err", err,
+		)
 		return nil, fmt.Errorf("failed to list DNS records: %w", err)
 	}
 

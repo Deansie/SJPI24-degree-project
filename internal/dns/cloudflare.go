@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/cloudflare/cloudflare-go"
 )
 
@@ -29,6 +30,9 @@ func NewClient() (*cloudflare.API, error) {
 	})
 
 	if err != nil {
+		logging.L().Error("Cloudflare client authentication failed",
+			"err", err,
+		)
 		return nil, fmt.Errorf("Cloudflare authentication failed: %w", err)
 	}
 

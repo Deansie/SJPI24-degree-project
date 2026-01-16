@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/cloudflare/cloudflare-go"
 )
 
@@ -90,6 +91,14 @@ func SyncDNSRecord(
 			return innerErr
 		})
 		if err != nil {
+			logging.L().Error(
+				"failed to create DNS record",
+				"domain", domain,
+				"type", recordType,
+				"target", params.Target,
+				"proxy", params.Proxy,
+				"err", err,
+			)
 			return nil, fmt.Errorf("failed to create DNS record: %w", err)
 		}
 
@@ -146,6 +155,14 @@ func SyncDNSRecord(
 			return innerErr
 		})
 		if err != nil {
+			logging.L().Error(
+				"failed to update DNS record",
+				"domain", domain,
+				"type", recordType,
+				"target", params.Target,
+				"proxy", params.Proxy,
+				"err", err,
+			)
 			return nil, fmt.Errorf("failed to update DNS record: %w", err)
 		}
 
@@ -200,6 +217,12 @@ func findZone(
 			return innerErr
 		})
 		if err != nil {
+			logging.L().Error(
+				"failed to resolve zone for domain",
+				"domain", domain,
+				"candidate", candidate,
+				"err", err,
+			)
 			return "", "", fmt.Errorf("failed to list zones: %w", err)
 		}
 
