@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -15,14 +13,14 @@ certificates. Supports initial setup flows and ensures end-to-end TLS encryption
 Integrates seamlessly with DNS sync for full external access automation.
 
 Examples:
-  k8s-deploy ingress setup --name myapp --host app.example.com --service myapp-service
-  k8s-deploy ingress create --file ingress.yaml  # With auto-annotations added
-  k8s-deploy ingress list`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ingress called")
-	},
+	k8s-deploy ingress setup --name myapp --host app.example.com --service myapp-service --affinity --limit-rps=10
+	k8s-deploy ingress setup --name myapp --host app.example.com --service myapp-service --enable-cors --cors-allow-origin=https://frontend.com
+/* 	k8s-deploy ingress create --file ingress.yaml  # With auto-annotations added
+	k8s-deploy ingress list */
+	`,
 }
 
 func init() {
 	rootCmd.AddCommand(ingressCmd)
+	ingressCmd.AddCommand(ingressSetupCmd)
 }
