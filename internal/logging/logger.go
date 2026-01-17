@@ -7,14 +7,21 @@ import (
 )
 
 var defaultLogger *slog.Logger
+var verbose bool
 
 func init() {
 	defaultLogger = New()
 }
 
 func New() *slog.Logger {
+	level := slog.LevelInfo
+	if verbose {
+		level = slog.LevelDebug
+	}
+
 	opts := &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level:     level,
+		AddSource: true, // Timestamps and source
 	}
 
 	format := strings.ToLower(os.Getenv("LOG_FORMAT"))
@@ -28,6 +35,11 @@ func New() *slog.Logger {
 	}
 
 	return slog.New(handler)
+}
+
+func SetVerbose(v bool) {
+	verbose = v
+	defaultLogger = New()
 }
 
 func L() *slog.Logger {

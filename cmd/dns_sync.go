@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Deansie/SJPI24-degree-project/internal/dns"
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +29,9 @@ If the record does not exist, it will be created.
 If the record exists but differs, it will be updated.
 If the record already matches, no changes are made.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		logging.L().Info("Starting DNS sync", "domain", syncDomain)
+
 		if syncDomain == "" {
 			return fmt.Errorf("--domain is required")
 		}
@@ -37,6 +41,7 @@ If the record already matches, no changes are made.`,
 
 		client, err := dns.NewClient()
 		if err != nil {
+			logging.L().Error("Failed to create Cloudflare client", "error", err)
 			return err
 		}
 
@@ -51,10 +56,12 @@ If the record already matches, no changes are made.`,
 			},
 		)
 		if err != nil {
+			logging.L().Error("DNS sync failed", "error", err)
 			return err
 		}
 
 		fmt.Println(result.Message)
+		logging.L().Info("DNS sync completed", "result", result.Message)
 		return nil
 	},
 }

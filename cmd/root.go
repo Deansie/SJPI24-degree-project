@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -28,6 +29,8 @@ const appLogo = `
 
 `
 
+var verbose bool
+
 var rootCmd = &cobra.Command{
 	Use:   "k8s-deploy",
 	Short: "A CLI tool for validating Kubernetes manifests, automating Ingress with TLS, and syncing DNS records.",
@@ -35,7 +38,7 @@ var rootCmd = &cobra.Command{
 rules, automating Ingress resources with cert-manager for Let's Encrypt TLS, and managing DNS records 
 in Cloudflare. Designed for SRE best practices, it helps prevent deployment errors, ensures end-to-end
 encryption,and streamlines CI/CD pipelines.`,
-	Version: "0.3",
+	Version: "1.0",
 }
 
 func Execute() {
@@ -59,6 +62,10 @@ func clearScreen() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose (debug) logging")
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		logging.SetVerbose(verbose)
+	}
 }
 
 var isInteractive = func() bool {
