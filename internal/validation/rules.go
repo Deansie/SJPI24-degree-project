@@ -8,11 +8,13 @@ type Container struct {
 	Limits   map[string]string
 }
 type Resource struct {
-	Kind       string
-	Name       string
-	Namespace  string
-	Labels     map[string]string
-	Containers []Container
+	Kind        string
+	Name        string
+	Namespace   string
+	Labels      map[string]string
+	Containers  []Container
+	Annotations map[string]string
+	Spec        Spec
 }
 type RuleViolation struct {
 	Resource Resource
@@ -34,12 +36,17 @@ func ruleNamespaceRequired(r Resource) []RuleViolation {
 	return violations
 }
 
-// Verify labels 'app' and 'env' are present
+// Verify labels 'app' and 'env' are present i kind is Deployment and StatefulSet
 
 func ruleRequiredLabels(r Resource) []RuleViolation {
 	var violations []RuleViolation
 
 	requiredLabels := []string{"app", "env"}
+	isMandatoryKind := r.Kind == "Deployment" || r.Kind == "StatefulSet" || r.Kind == "DaemonSet"
+
+	if !isMandatoryKind {
+		return violations
+	}
 
 	for _, label := range requiredLabels {
 		if r.Labels == nil {
@@ -65,6 +72,10 @@ func ruleRequiredLabels(r Resource) []RuleViolation {
 
 func ruleContainerResources(r Resource) []RuleViolation {
 	var violations []RuleViolation
+
+	if r.Kind != "Deployment" && r.Kind != "StatefulSet" {
+		return violations
+	}
 
 	for _, c := range r.Containers {
 		if c.Requests == nil || c.Limits == nil {
@@ -107,6 +118,34 @@ func ruleContainerResources(r Resource) []RuleViolation {
 	return violations
 }
 
+func ruleIngressSpecific(r Resource) []RuleViolation {
+	var violations []RuleViolation
+
+	if r.Kind != "Ingress" {
+		return violations
+	}
+
+	// Require ingressClassName for explicit controller
+	if r.Spec.IngressClassName == "" {
+		violations = append(violations, RuleViolation{
+			Resource: r,
+			Message:  "Ingress must specify ingressClassName (e.g., 'nginx')",
+		})
+	}
+
+	// If TLS spec present, require cert-manager annotation
+	if len(r.Spec.TLS) > 0 {
+		if _, ok := r.Annotations["cert-manager.io/cluster-issuer"]; !ok {
+			violations = append(violations, RuleViolation{
+				Resource: r,
+				Message:  "Ingress with TLS must include cert-manager.io/cluster-issuer annotation for automatic certs",
+			})
+		}
+	}
+
+	return violations
+}
+
 // Rule runner
 
 func ValidateRules(resources []Resource) []RuleViolation {
@@ -116,6 +155,7 @@ func ValidateRules(resources []Resource) []RuleViolation {
 		allViolations = append(allViolations, ruleNamespaceRequired(r)...)
 		allViolations = append(allViolations, ruleRequiredLabels(r)...)
 		allViolations = append(allViolations, ruleContainerResources(r)...)
+		allViolations = append(allViolations, ruleIngressSpecific(r)...)
 	}
 
 	return allViolations
