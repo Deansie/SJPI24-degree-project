@@ -47,7 +47,6 @@ func init() {
 	applyCmd.Flags().StringVar(&applyNamespace, "namespace", "", "Namespace to apply to (overrides manifest)")
 	applyCmd.Flags().StringVar(&applyKubeconfig, "kubeconfig", filepath.Join(homedir.HomeDir(), ".kube", "config"), "Path to kubeconfig")
 	applyCmd.Flags().BoolVar(&applyDryRun, "dry-run", false, "Simulate apply without changes")
-	_ = applyCmd.MarkFlagRequired("file")
 }
 
 func runApply(cmd *cobra.Command, args []string) error {
