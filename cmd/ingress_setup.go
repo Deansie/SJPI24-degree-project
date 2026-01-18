@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -96,9 +97,6 @@ func init() {
 	ingressSetupCmd.Flags().StringVar(&proxyBodySize, "proxy-body-size", "1m", "Max proxy body size (e.g., 8m for larger uploads)")
 	ingressSetupCmd.Flags().StringVar(&ingressEnv, "env", "", "Environment label for Ingress (e.g., prod, staging, dev; optional)")
 
-	_ = ingressSetupCmd.MarkFlagRequired("name")
-	_ = ingressSetupCmd.MarkFlagRequired("host")
-	_ = ingressSetupCmd.MarkFlagRequired("service")
 }
 
 type Ingress struct {
@@ -155,12 +153,16 @@ type Port struct {
 }
 
 func runIngressSetup(cmd *cobra.Command, args []string) error {
+	logging.L().Info("Starting Ingress setup", "name", ingressName, "host", ingressHost)
+
 	if ingressName == "" || ingressHost == "" || ingressService == "" {
+		logging.L().Warn("Missing required flags")
 		return fmt.Errorf("required flags: --name, --host, --service")
 	}
 
 	useTLS := enableTLS && !noTLS
 	if !useTLS {
+		logging.L().Warn("TLS disabled")
 		fmt.Println("Warning: TLS is disabled. Consider enabling for security.")
 	}
 
@@ -247,17 +249,22 @@ func runIngressSetup(cmd *cobra.Command, args []string) error {
 
 	yamlData, err := yaml.Marshal(ing)
 	if err != nil {
+		logging.L().Error("Failed to generate Ingress YAML", "err", err)
 		return fmt.Errorf("failed to generate YAML: %w", err)
 	}
 
 	if ingressOutput != "" {
 		if err := os.WriteFile(ingressOutput, yamlData, 0644); err != nil {
+			logging.L().Error("Failed to write file", "file", ingressOutput, "err", err)
 			return fmt.Errorf("failed to write to file: %w", err)
 		}
 		fmt.Printf("Ingress YAML written to %s\n", ingressOutput)
+		logging.L().Info("YAML written to file", "file", ingressOutput)
 	} else {
 		fmt.Println(string(yamlData))
+		logging.L().Info("YAML printed to stdout")
 	}
 
+	logging.L().Info("Ingress setup")
 	return nil
 }

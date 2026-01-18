@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,9 @@ Examples:
 /* 	k8s-deploy ingress create --file ingress.yaml  # With auto-annotations added
 	k8s-deploy ingress list */
 	`,
+	PreRun: func(cmd *cobra.Command, args []string) {
+		logging.L().Info("Entering Ingress command group")
+	},
 }
 
 func init() {
