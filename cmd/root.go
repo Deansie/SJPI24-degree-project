@@ -62,7 +62,7 @@ func clearScreen() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
-	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose (debug) logging")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose (debug) logging")
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		logging.SetVerbose(verbose)
 	}

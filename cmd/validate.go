@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/Deansie/SJPI24-degree-project/internal/validation"
 	"github.com/spf13/cobra"
 	"github.com/yannh/kubeconform/pkg/validator"
@@ -38,24 +39,32 @@ func init() {
 // Command entrypoint
 
 func runValidate(cmd *cobra.Command, args []string) error {
+	logging.L().Info("Starting validation", "args", args)
+
 	opts, err := readValidatorOptions(cmd)
 	if err != nil {
+		logging.L().Error("Failed to read options", "err", err)
 		return err
 	}
 
 	inputs, err := collectInputs(args)
 	if err != nil {
+		logging.L().Error("Failed to collect inputs", "err", err)
 		return err
 	}
+
+	logging.L().Debug("Inputs collected", "count", len(inputs))
 
 	results := validateInputsPerFile(opts, inputs)
 
 	if len(results) == 0 {
 		fmt.Println("No YAML manifests found to validate")
+		logging.L().Warn("No YAML manifests found")
 		return nil
 	}
 
 	if errors := reportResults(results); errors > 0 {
+		logging.L().Error("Validation failed", "errors", errors)
 		fmt.Println("\nRule validation skipped due to schema validation errors")
 		return fmt.Errorf("%d validation error(s) found", errors)
 	}
@@ -67,20 +76,25 @@ func runValidate(cmd *cobra.Command, args []string) error {
 	for _, in := range inputs {
 		resources, err := validation.ParseResources(bytes.NewReader(in.Data))
 		if err != nil {
+			logging.L().Error("Failed to parse resources", "err", err)
 			return fmt.Errorf("failed to parse resources: %w", err)
 		}
 		allResources = append(allResources, resources...)
 	}
+
+	logging.L().Debug("Resources parsed", "count", len(allResources))
 
 	// Apply rules
 
 	violations := validation.ValidateRules(allResources)
 	if len(violations) > 0 {
 		validation.ReportRuleViolations(violations)
+		logging.L().Error("Rule violations found", "count", len(violations))
 		return fmt.Errorf("%d rule violation(s) found", len(violations))
 	}
 
 	fmt.Println("✓ Rule validation passed (all resources comply with enforced rules)")
+	logging.L().Info("Validation completed successfully")
 	return nil
 }
 

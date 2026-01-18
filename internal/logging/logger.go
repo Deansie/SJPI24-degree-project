@@ -14,7 +14,7 @@ func init() {
 }
 
 func New() *slog.Logger {
-	level := slog.LevelInfo
+	level := slog.LevelWarn
 	if verbose {
 		level = slog.LevelDebug
 	}

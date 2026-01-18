@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Deansie/SJPI24-degree-project/internal/dns"
+	"github.com/Deansie/SJPI24-degree-project/internal/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -20,12 +21,15 @@ var dnsListCmd = &cobra.Command{
 
 This command is read-only and safe for CI/CD pipelines.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		logging.L().Info("Starting DNS list", "zone", listZone, "type", listType)
+
 		if listZone == "" {
 			return fmt.Errorf("--zone is required")
 		}
 
 		client, err := dns.NewClient()
 		if err != nil {
+			logging.L().Error("Failed to create client", "err", err)
 			return err
 		}
 
@@ -36,8 +40,11 @@ This command is read-only and safe for CI/CD pipelines.`,
 			listType,
 		)
 		if err != nil {
+			logging.L().Error("Failed to list records", "err", err)
 			return err
 		}
+
+		logging.L().Debug("Records found", "count", len(records))
 
 		if len(records) == 0 {
 			fmt.Println("No DNS records found.")
@@ -55,6 +62,7 @@ This command is read-only and safe for CI/CD pipelines.`,
 			)
 		}
 
+		logging.L().Info("DNS list completed")
 		return nil
 	},
 }
