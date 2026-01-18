@@ -1,8 +1,0 @@
-time=2026-01-18T08:56:07.223+01:00 level=INFO source=/home/dennis-andersen/Dokument/Programmering/Git/SJPI24-degree-project/cmd/validate.go:42 msg="Starting validation" args=[test/test-deployment-invalid.yaml]
-time=2026-01-18T08:56:07.224+01:00 level=DEBUG source=/home/dennis-andersen/Dokument/Programmering/Git/SJPI24-degree-project/cmd/validate.go:56 msg="Inputs collected" count=1
-time=2026-01-18T08:56:07.352+01:00 level=ERROR source=/home/dennis-andersen/Dokument/Programmering/Git/SJPI24-degree-project/cmd/validate.go:67 msg="Validation failed" errors=2
-          
-   ERROR  
-          
-  2 validation error(s) found.                                                                                        
-
