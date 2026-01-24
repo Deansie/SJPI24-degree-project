@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-deployment
+spec:
+  replicas: two            # Must be an integer
+  selector:
+    matchLabels:
+      app: broken
+  template:
+    metadata:
+      labels:
+        app: broken
+    spec:
+      containers:
+        - name: broken
+          image: nginx
+          ports:
+            - port: 80          # Wrong field name (should be containerPort)
+      restartPolicy: Always     # Not allowed in Deployment pod spec
